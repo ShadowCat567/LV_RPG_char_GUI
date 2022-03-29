@@ -6,6 +6,7 @@ using TMPro;
 
 public class characterManager : MonoBehaviour
 {
+    //variables related to the UI elements on screen
     [SerializeField] GameObject charName;
     [SerializeField] GameObject charClass;
     [SerializeField] GameObject charBG;
@@ -21,12 +22,12 @@ public class characterManager : MonoBehaviour
     [SerializeField] TMP_Text CurhitPointText;
     [SerializeField] TMP_Text initativeText;
 
-    //need to randomize values
-
+    //variables for the three different base hp values
     int martialHP = 10;
     int hybridHP = 8;
     int casterHP = 6;
 
+    //variables to store the text from the UI elements
     string characterName;
     string characterClass;
     string characterBG;
@@ -45,6 +46,7 @@ public class characterManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //stores text from UI elements in string variables
         characterName = charName.GetComponent<TMP_InputField>().text;
         characterClass = charClass.GetComponent<TMP_Dropdown>().captionText.text;
         characterBG = charBG.GetComponent<TMP_InputField>().text;
@@ -63,19 +65,26 @@ public class characterManager : MonoBehaviour
 
     public void RandomizeCharacter()
     {
+        //generates random values and stores them in their corresponding variable
+        //attribute stats have a randomly generated limit of 1-20 since that's the limit in Dungeons and Dragons
         strength = Random.Range(1, 20).ToString();
         dexterity = Random.Range(1, 20).ToString();
         consititution = Random.Range(1, 20).ToString();
         intelligence = Random.Range(1, 20).ToString();
         charisma = Random.Range(1, 20).ToString();
         wisdom = Random.Range(1, 20).ToString();
+        //armor class has a limit of 10-20 since that's where most DnD armor classes are
         AC = Random.Range(10, 20).ToString();
+        //speed is not randomly generated, most DnD characters have a speed of 30ft
         charSpeed = "30";
+        //selects a random index value from the Backgrounds array
         int randomBG = Random.Range(0, 5);
+        //selects a random index value from the options list within the character class drop down 
         int randomClass = Random.Range(1, 6);
         characterBG = backgroundArr[randomBG];
         characterClass = charClass.GetComponent<TMP_Dropdown>().options[randomClass].text;
 
+        //displays the randomly generated values in their correct place
         charBG.GetComponent<TMP_InputField>().text = characterBG;
         charClass.GetComponent<TMP_Dropdown>().captionText.text = characterClass;
         armorClass.GetComponent<TMP_InputField>().text = AC;
@@ -87,70 +96,95 @@ public class characterManager : MonoBehaviour
         statDEX.GetComponent<TMP_InputField>().text = dexterity;
         statCON.GetComponent<TMP_InputField>().text = consititution;
 
+        //calculates the Randomly generated character's HP and initiative
         CalculateHitPoints();
         calculateInitiative();
     }
 
     public void UpdateCharText()
     {
+        //updates the character's name to the value inputted to the Input field
         characterName = charName.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateCharClass()
     {
+        //updates the character's class to the value selected from the Dropdown and calculate HP based on class
         characterClass = charClass.GetComponent<TMP_Dropdown>().captionText.text;
-        CalculateHitPoints();
+        //makes sure exepection is not thrown if the player does not input anything in Character class or consititution
+        if (statCON.GetComponent<TMP_InputField>().text != "" && charClass.GetComponent<TMP_Dropdown>().captionText.text != "Character Class")
+        {
+            CalculateHitPoints();
+        }
     }
 
     public void UpdateCharBG()
     {
+        //updates the character's background to the value inputted to the Input field
         characterBG = charBG.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateArmorClass()
     {
+        //updates the character's Armor class to the value inputted to the Input field
         AC = armorClass.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateSpeed()
     {
+        //updates the character's speed to the value inputted to the Input field
         charSpeed = speed.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateINT()
     {
+        //updates intelligence stat to the value inputted to the Input field
         intelligence = statINT.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateCHA()
     {
+        //updates charisma stat to the value inputted to the Input field
         charisma = statCHA.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateWIS()
     {
+        //updates wisdom stat to the value inputted to the Input field
         wisdom = statWIS.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateSTR()
     {
+        //updates strength stat to the value inputted to the Input field
         strength = statSTR.GetComponent<TMP_InputField>().text;
     }
 
     public void UpdateCON()
     {
+        //updates constitution stat to the value inputted to the Input field and updates the character's HP based on CON
         consititution = statCON.GetComponent<TMP_InputField>().text;
-        CalculateHitPoints();
+        //makes sure excepection is not thrown if the player does not input anything in Character class or consititution
+        if (statCON.GetComponent<TMP_InputField>().text != "" && charClass.GetComponent<TMP_Dropdown>().captionText.text != "Character Class")
+        {
+            CalculateHitPoints();
+        }
     }
     
     public void UpdateDEX()
     {
+        //updates dexterity stat to the value inputted to the Input field and updates the character's initative based on DEX
         dexterity = statDEX.GetComponent<TMP_InputField>().text;
-        calculateInitiative();
+        //makes sure execption is not thrown if player does not input anything in dexterity
+        if (statDEX.GetComponent<TMP_InputField>().text != "")
+        {
+            calculateInitiative();
+        }
     }
 
     void CalculateHitPoints()
     {
+        //calculates the constitution modifier based on constitution's value, then uses the character class and consitiution modifier to calculate HP value
         int ConMod = ConvertToModifier(int.Parse(consititution));
 
         if (characterClass == "Fighter" || characterClass == "Paladin" || characterClass == "Ranger")
@@ -172,14 +206,17 @@ public class characterManager : MonoBehaviour
         {
             hitPoints = "0";
         }
-       
+
+       //updates text to match HP value calculated
         MaxhitPointText.text = "Maximum Hit Points: " + hitPoints;
         CurhitPointText.text = "Current Hit Points: " + hitPoints;
     }
 
     void calculateInitiative()
     {
+        //calculates dexterity modifier based on dexterity stat and updates intitative text to match the value
         int dexMod = ConvertToModifier(int.Parse(dexterity));
+
         if (dexMod < 0)
         {
             initativeText.text = dexMod.ToString();
@@ -192,6 +229,8 @@ public class characterManager : MonoBehaviour
 
     int ConvertToModifier(int stat)
     {
+        //converts the raw stat value to a modifier based on the modifiers in Dungeons and Dragons
+        //takes the stat value, returns the modifier
         int mod = 0;
 
         if (stat == 1)
